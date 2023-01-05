@@ -1,6 +1,7 @@
 ﻿using DG.Tweening;
 using UniRx;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class PlayerAnimate : GameBehaviour
 {
@@ -11,6 +12,7 @@ public class PlayerAnimate : GameBehaviour
     private float offset;
     [SerializeField]
     private float emitInterval;
+    [Inject]
     private Player player;
 
     private ParticleSystem particle;
@@ -25,16 +27,15 @@ public class PlayerAnimate : GameBehaviour
     public override void GameStart()
     {
         this.particle = GetComponentInChildren<ParticleSystem>();
-        this.player = GetComponent<Player>();
         this.player.IsDashing
             .Skip(1)
             .Subscribe(d =>
             {
                 transform.DOKill();
                 // Start dashing
-                if(d)
+                if (d)
                 {
-                    if(Mathf.Abs(this.player.velocity.x) > 0)
+                    if (Mathf.Abs(this.player.velocity.x) > 0)
                         transform.DOScaleY(0.5f, 0.1f);
                     else
                         transform.DOScaleX(0.5f, 0.1f);
@@ -54,14 +55,14 @@ public class PlayerAnimate : GameBehaviour
 
     public override void GameUpdate()
     {
-        var dir = (Vector2) Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2) transform.position;
+        var dir = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position;
         // Move face toward mouse position
         this.face.DOKill();
         this.face.DOLocalMove(dir.normalized * this.offset, 0.1f);
-        if(this.player.velocity.sqrMagnitude > 0)
+        if (this.player.velocity.sqrMagnitude > 0)
         {
             this.emitTimer -= Time.deltaTime;
-            if(this.emitTimer <= 0)
+            if (this.emitTimer <= 0)
             {
                 this.emitTimer = this.emitInterval;
                 this.trailEmit(5);

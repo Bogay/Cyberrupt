@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using Reflex;
+using Reflex.Scripts.Attributes;
 
 public class EnemyManager : GameBehaviour
 {
     public static EnemyManager instance { get; private set; }
 
     private ScreenBound bound = null;
-    private WarningUI warning = null;
+    [Inject]
+    private WarningUI warning;
 
     private bool startUp = false;
     private bool isFirstWave = true;
@@ -43,6 +45,9 @@ public class EnemyManager : GameBehaviour
     public GameEvent OnExitBossWave { get; } = new GameEvent();
     public GameEvent OnGameClear { get; } = new GameEvent();
 
+    [Inject]
+    private readonly Container container;
+
     public override void GameAwake()
     {
         if (instance == null)
@@ -62,7 +67,6 @@ public class EnemyManager : GameBehaviour
     public override void GameStart()
     {
         bound = ScreenBound.instance;
-        warning = DependencyContainer.GetDependency<WarningUI>() as WarningUI;
     }
 
     public override void GameUpdate()
@@ -70,7 +74,7 @@ public class EnemyManager : GameBehaviour
         //訂閱者要在GameStart才能安全獲取EnemyManager的instance（無法保證GameAwake的執行順序）
         //為了確保所有訂閱者都不會漏接事件，把事件最早發生的情形挪到第一個frame的update中
         //但是這感覺不是個好方法...
-        if(!startUp)
+        if (!startUp)
         {
             MoveToNextWave();
             startUp = true;
@@ -82,7 +86,7 @@ public class EnemyManager : GameBehaviour
 
     public void AddEnemy(Enemy enemy)
     {
-        if(!enemies.Contains(enemy))
+        if (!enemies.Contains(enemy))
         {
             enemies.Add(enemy);
             OnEnemySpawned.Invoke(enemy);
@@ -124,7 +128,7 @@ public class EnemyManager : GameBehaviour
     IEnumerator WaitAndSpawn()
     {
         //生第一波怪的時候不應該出現延遲
-        if(!isFirstWave)
+        if (!isFirstWave)
         {
             _delayTimer = (waves[waveIndex - 2].haveWaveDelay) ? waves[waveIndex - 2].nextWaveDelay : defaultWaveDelay;
 
@@ -155,7 +159,7 @@ public class EnemyManager : GameBehaviour
 
     private void SpawnWave(EnemyWave wave)
     {
-        if(wave.isBossWave)
+        if (wave.isBossWave)
         {
             warning.OnWarningDone += () => SpawnBoss(wave);
             warning.StartWarning();
@@ -165,9 +169,17 @@ public class EnemyManager : GameBehaviour
             foreach (EnemySpawnData data in wave.spawns)
             {
                 if (bound.InScreen(data.position))
-                    Instantiate(enemySpawnZone, data.position, Quaternion.identity).GetComponent<EnemySpawnZone>().InjectData(data);
+                    this.container.InstantiateGameObject(
+                        enemySpawnZone,
+                        data.position,
+                        Quaternion.identity
+                    ).GetComponent<EnemySpawnZone>().InjectData(data);
                 else
-                    Instantiate(data.enemy, data.position, Quaternion.identity);
+                    this.container.InstantiateGameObject(
+                        data.enemy,
+                        data.position,
+                        Quaternion.identity
+                    );
             }
         }
     }
@@ -180,13 +192,13 @@ public class EnemyManager : GameBehaviour
 
         if (bound.InScreen(data.position))
         {
-            EnemySpawnZone zone = Instantiate(enemySpawnZone, data.position, Quaternion.identity).GetComponent<EnemySpawnZone>();
+            EnemySpawnZone zone = this.container.InstantiateGameObject(enemySpawnZone, data.position, Quaternion.identity).GetComponent<EnemySpawnZone>();
             zone.InjectData(data);
             zone.OnEnemySpawn += x => OnBossSpawn.Invoke(x);
         }
         else
         {
-            Enemy boss = Instantiate(data.enemy, data.position, Quaternion.identity).GetComponent<Enemy>();
+            Enemy boss = this.container.InstantiateGameObject(data.enemy, data.position, Quaternion.identity).GetComponent<Enemy>();
             OnBossSpawn.Invoke(boss);
         }
     }

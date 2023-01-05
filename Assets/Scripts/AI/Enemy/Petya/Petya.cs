@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class Petya : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 {
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    public Transform target => this.player.transform;
 
     private AIStateMachine _stateMachine;
     public AIStateMachine stateMachine { get { return _stateMachine; } }
@@ -15,6 +15,7 @@ public class Petya : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     //====================
 
+    [Inject]
     private Player player;
 
     [SerializeField]
@@ -50,7 +51,7 @@ public class Petya : Enemy, ITarget, IStateMachine, ISpawnDanmaku
     protected override void EnemyStart()
     {
         up.transform.SetParent(null);
-        up.transform.position = new Vector2(0, (screen == null)? 6 : screen.GetWorldScreenMaxY + 0.5f);
+        up.transform.position = new Vector2(0, (screen == null) ? 6 : screen.GetWorldScreenMaxY + 0.5f);
         up.transform.rotation = Quaternion.Euler(0, 0, -90);
 
         left.transform.SetParent(null);
@@ -58,9 +59,6 @@ public class Petya : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
         right.transform.SetParent(null);
         right.transform.position = new Vector2((screen == null) ? 10 : screen.GetWorldScreenMaxX + 0.5f, 0);
-
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
     }
 
     protected override void EnemyUpdate()
@@ -70,7 +68,7 @@ public class Petya : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     private void UpdateTransform()
     {
-        Vector2 direction = _target.position - transform.position;
+        Vector2 direction = this.target.position - transform.position;
 
         //Deal with position.
         float lerp = Mathf.Clamp01((direction.magnitude - stopRadius) / (slowDownRadius - stopRadius));

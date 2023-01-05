@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
+using Reflex;
+using Reflex.Scripts.Attributes;
 
 public class DanmakuManager : GameBehaviour
 {
@@ -37,6 +39,9 @@ public class DanmakuManager : GameBehaviour
 
     private List<IDanmaku> danmakus = new List<IDanmaku>();
 
+    [Inject]
+    private readonly Container container;
+
     public override void GameAwake()
     {
         if (_instance == null)
@@ -49,7 +54,7 @@ public class DanmakuManager : GameBehaviour
 
         _bound.parent = transform;
 
-        for (int i = 0; i < poolSize; i ++)
+        for (int i = 0; i < poolSize; i++)
         {
             //聽著，給我聽著
             //不要在Assert裡寫入會影響程式主邏輯運行的東西，Assertion在正式的Build裡會被自動忽略
@@ -57,14 +62,14 @@ public class DanmakuManager : GameBehaviour
             //底下兩行被封印的Assertion就是血淋淋的例子，在此保留以做教訓
             //請未來的我或是看到這個註解的人在撒旦的榮光面前發誓別犯這個智障錯誤
 
-            GameObject newObject = Instantiate(poolPrefab);
+            GameObject newObject = this.container.InstantiateGameObject(poolPrefab);
             SpriteRenderer sr = newObject.GetComponent<SpriteRenderer>();
             //Assert.IsTrue(newObject.TryGetComponent(out sr), "There's no sprite renderer on the game object.");
             sr.sortingOrder = i;
             newObject.SetActive(false);
             pool.Enqueue(sr);
 
-            newObject = Instantiate(poolParticle);
+            newObject = this.container.InstantiateGameObject(poolParticle);
             ParticleSystem ps = newObject.GetComponent<ParticleSystem>();
             //Assert.IsTrue(newObject.TryGetComponent(out ps), "There's no particle system on the game object.");
             newObject.SetActive(false);
@@ -155,7 +160,7 @@ public class DanmakuManager : GameBehaviour
         if (_target == null)
             return false;
         bool result = _target.TouchTarget(position, radius);
-        if(result)
+        if (result)
             bulletHitTarget.Invoke();
         return result;
     }

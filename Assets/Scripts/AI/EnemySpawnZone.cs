@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UltEvents;
+using Reflex;
+using Reflex.Scripts.Attributes;
 
 public class EnemySpawnZone : GameBehaviour
 {
@@ -23,7 +25,7 @@ public class EnemySpawnZone : GameBehaviour
     private Collider2D keepOut;
     [SerializeField]
     private ParticleSystem ps;
-    
+
     [SerializeField]
     private SpawnZoneData normalData;
     [SerializeField]
@@ -40,6 +42,9 @@ public class EnemySpawnZone : GameBehaviour
     private EnemySpawnData data;
     private float size;
     private Sprite iconSprite;
+
+    [Inject]
+    private readonly Container container;
 
     public void InjectData(EnemySpawnData spawnData)
     {
@@ -64,9 +69,9 @@ public class EnemySpawnZone : GameBehaviour
 
         repelForceField.SetActive(false);
 
-        Enemy e = Instantiate(data.enemy, data.position, Quaternion.identity).GetComponent<Enemy>();
+        Enemy e = this.container.InstantiateGameObject(data.enemy, data.position, Quaternion.identity).GetComponent<Enemy>();
         OnEnemySpawn.Invoke(e);
-        
+
         ps.transform.SetParent(null);
         ps.Play();
         outline.DOFade(0, fadeTime);

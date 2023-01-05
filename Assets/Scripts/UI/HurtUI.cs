@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Reflex.Scripts.Attributes;
 
 public class HurtUI : GameBehaviour
 {
@@ -9,10 +10,11 @@ public class HurtUI : GameBehaviour
     private CanvasGroup group;
     [SerializeField]
     private float fadeTime;
+    [Inject]
+    private Player player;
 
     public override void GameStart()
     {
-        Player player = DependencyContainer.GetDependency<Player>() as Player;
         player.OnReceiveDamage += HurtVFX;
     }
 

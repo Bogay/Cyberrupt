@@ -1,15 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class HomingMissile : Enemy, ITarget, ISpawnDanmaku
 {
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    public Transform target => this.player.transform;
 
     private SpawnDanmakuHelper _danmakuHelper;
     public SpawnDanmakuHelper danmakuHelper { get { return _danmakuHelper; } }
 
+    [Inject]
     private Player player;
 
     [SerializeField]
@@ -35,18 +36,12 @@ public class HomingMissile : Enemy, ITarget, ISpawnDanmaku
         aimer.rotation = Quaternion.Euler(0, 0, angle);
     }
 
-    protected override void EnemyStart()
-    {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
-    }
-
     public override void GameFixedUpdate()
     {
         if (timer >= lifeTime)
             OnDeath.Invoke();
 
-        Vector2 targetDirection = (_target.position - transform.position).normalized;
+        Vector2 targetDirection = (this.target.position - transform.position).normalized;
         velocityDirection = Vector2.Lerp(velocityDirection, targetDirection, 0.035f).normalized;
         transform.position += (Vector3)velocityDirection * speed * Time.fixedDeltaTime;
 
@@ -57,7 +52,7 @@ public class HomingMissile : Enemy, ITarget, ISpawnDanmaku
     {
         if (CollisionLayer.CollideWithMask(collision.gameObject, CollisionLayer.instance.playerMask))
         {
-            if(!player.isImmune)
+            if (!player.isImmune)
             {
                 player.OnHit();
                 Die();

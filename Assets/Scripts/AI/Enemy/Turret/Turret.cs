@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class Turret : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 {
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    public Transform target => this.player.transform;
 
     private AIStateMachine _stateMachine;
     public AIStateMachine stateMachine { get { return _stateMachine; } }
@@ -39,6 +39,7 @@ public class Turret : Enemy, ITarget, IStateMachine, ISpawnDanmaku
     //如果上一個frame的InScreen為true，這個frame卻為false，那就代表敵人的座標已經離開邊界
     private bool previousInScreen;
 
+    [Inject]
     private Player player;
 
     private Vector2 startPosition;
@@ -57,8 +58,6 @@ public class Turret : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     protected override void EnemyStart()
     {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
         StartCoroutine(CreatePath());
     }
 

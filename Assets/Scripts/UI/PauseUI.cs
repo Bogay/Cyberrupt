@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Reflex.Scripts.Attributes;
 
 public class PauseUI : GameBehaviour
 {
@@ -11,7 +12,9 @@ public class PauseUI : GameBehaviour
     private CanvasGroup canvasGroup;
     [SerializeField]
     private Slider master, music, sfx;
-    
+
+    [Inject]
+    private Player player;
     private bool isUIEnable = false;
 
     //These are for god mode, should be removed on the final build.
@@ -28,7 +31,6 @@ public class PauseUI : GameBehaviour
 
     public override void GameStart()
     {
-        Player player = DependencyContainer.GetDependency<Player>() as Player;
         godModeButton.onClick.AddListener(() =>
         {
             player.SetInvulnerability(!player.isInvulnerable);
@@ -43,14 +45,14 @@ public class PauseUI : GameBehaviour
         master.value = manager.GetVolume("MasterVol");
         music.value = manager.GetVolume("MusicVol");
         sfx.value = manager.GetVolume("SfxVol");
-        master.onValueChanged.AddListener(x => manager.SetVolume("MasterVol",x));
+        master.onValueChanged.AddListener(x => manager.SetVolume("MasterVol", x));
         music.onValueChanged.AddListener(x => manager.SetVolume("MusicVol", x));
         sfx.onValueChanged.AddListener(x => manager.SetVolume("SfxVol", x));
     }
 
     public override void GameUpdate()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             isUIEnable = !isUIEnable;
             SetPauseUI();
@@ -60,7 +62,7 @@ public class PauseUI : GameBehaviour
     private void SetPauseUI()
     {
         pauseUI.SetActive(isUIEnable);
-        canvasGroup.alpha = (isUIEnable)? 1 : 0;
+        canvasGroup.alpha = (isUIEnable) ? 1 : 0;
         canvasGroup.blocksRaycasts = isUIEnable;
         canvasGroup.interactable = isUIEnable;
         if (TimeManager.paused)

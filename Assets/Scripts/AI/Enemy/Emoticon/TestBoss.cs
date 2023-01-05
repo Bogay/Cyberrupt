@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class TestBoss : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 {
@@ -11,8 +12,7 @@ public class TestBoss : Enemy, ITarget, IStateMachine, ISpawnDanmaku
         https://creativecommons.org/licenses/by/4.0/
     */
 
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    public Transform target => this.player.transform;
 
     private AIStateMachine _stateMachine;
     public AIStateMachine stateMachine { get { return _stateMachine; } }
@@ -22,8 +22,9 @@ public class TestBoss : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     //====================
 
+    [Inject]
     private Player player;
-    
+
     [SerializeField]
     private float speed;
     [SerializeField]
@@ -38,15 +39,9 @@ public class TestBoss : Enemy, ITarget, IStateMachine, ISpawnDanmaku
         Death.AddAction(() => Instantiate(clearScreen));
     }
 
-    protected override void EnemyStart()
-    {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
-    }
-
     private void UpdateTransform()
     {
-        Vector2 direction = _target.position - transform.position;
+        Vector2 direction = this.target.position - transform.position;
         transform.position += (Vector3)direction.normalized * speed * Time.fixedDeltaTime;
     }
 }

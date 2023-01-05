@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class Meltdown : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 {
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    public Transform target => this.player.transform;
 
     private AIStateMachine _stateMachine;
     public AIStateMachine stateMachine { get { return _stateMachine; } }
@@ -15,6 +15,7 @@ public class Meltdown : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     //====================
 
+    [Inject]
     private Player player;
 
     [SerializeField]
@@ -24,7 +25,7 @@ public class Meltdown : Enemy, ITarget, IStateMachine, ISpawnDanmaku
     [SerializeField]
     private float stopRadius;
 
-    private Vector2 velocityDirection;    
+    private Vector2 velocityDirection;
     [SerializeField, Range(0f, 1f)]
     private float lookAtStrenth;
     [SerializeField, Range(0f, 1f)]
@@ -41,15 +42,12 @@ public class Meltdown : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     protected override void EnemyStart()
     {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
-
-        velocityDirection = (_target.position - transform.position).normalized;
+        velocityDirection = (this.target.position - transform.position).normalized;
     }
 
     private void UpdateTransform()
     {
-        Vector2 direction = _target.position - transform.position;
+        Vector2 direction = this.target.position - transform.position;
 
         //Deal with rotation.
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -74,6 +72,6 @@ public class Meltdown : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     public void ReadjustDirection()
     {
-        velocityDirection = (_target.position - transform.position).normalized;
+        velocityDirection = (this.target.position - transform.position).normalized;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class PlayerEmoji : GameBehaviour
 {
@@ -8,7 +9,7 @@ public class PlayerEmoji : GameBehaviour
     //But since we have only 4 face, it's probably fine.
     [SerializeField]
     private SpriteRenderer face;
-    
+
     [SerializeField]
     private Sprite idle;
     [SerializeField]
@@ -17,7 +18,7 @@ public class PlayerEmoji : GameBehaviour
     private Sprite hurt;
     [SerializeField]
     private Sprite dead;
-
+    [Inject]
     private Player player;
 
     private const float stayTime = 3;
@@ -26,7 +27,6 @@ public class PlayerEmoji : GameBehaviour
 
     public override void GameStart()
     {
-        player = DependencyContainer.GetDependency<Player>() as Player;
         player.OnReceiveDamage += () => StartCoroutine(SwitchToHurt());
         player.OnDied.AddListener(SwitchToDead);
 

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UltEvents;
+using Reflex;
+using Reflex.Scripts.Attributes;
 
 public class HeartBleed_Missile : AIState
 {
@@ -19,6 +21,9 @@ public class HeartBleed_Missile : AIState
     private List<GameObject> missiles = new List<GameObject>();
     private int missileCounter = 0;
 
+    [Inject]
+    private readonly Container container;
+
     protected override void OnStateEnter()
     {
         base.OnStateEnter();
@@ -31,7 +36,7 @@ public class HeartBleed_Missile : AIState
     {
         base.OnStateUpdate(delta);
 
-        for(int i = missiles.Count - 1; i >= 0; i--)
+        for (int i = missiles.Count - 1; i >= 0; i--)
         {
             if (missiles[i] == null)
                 missiles.RemoveAt(i);
@@ -45,9 +50,9 @@ public class HeartBleed_Missile : AIState
     {
         missileCounter = spawnCount;
 
-        for (int i = 0; i < spawnCount; i ++)
+        for (int i = 0; i < spawnCount; i++)
         {
-            GameObject go = Instantiate(missile, muzzle.position, Quaternion.identity);
+            GameObject go = this.container.InstantiateGameObject(missile, muzzle.position, Quaternion.identity);
             missiles.Add(go);
             OnSpawn.Invoke();
             yield return new WaitForSeconds(spawnDelay);

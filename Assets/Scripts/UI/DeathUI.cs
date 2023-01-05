@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using Reflex.Scripts.Attributes;
 
 public class DeathUI : GameBehaviour
 {
@@ -24,6 +25,7 @@ public class DeathUI : GameBehaviour
     [SerializeField]
     private float uiFadeTime;
 
+    [Inject]
     private Player player;
 
     private GameBehaviour[] uiBehaviours;
@@ -38,7 +40,6 @@ public class DeathUI : GameBehaviour
 
     public override void GameStart()
     {
-        player = DependencyContainer.GetDependency<Player>() as Player;
         player.OnDied.AddListener(Death);
 
         uiBehaviours = GetComponents<GameBehaviour>();

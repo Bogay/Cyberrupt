@@ -69,7 +69,6 @@ public class Player : GameBehaviour, IDanmakuTarget
 
     public override void GameAwake()
     {
-        DependencyContainer.AddDependency(this);
         _weaponController = GetComponent<WeaponController>();
         _skillController = GetComponent<SkillController>();
         this.IsDashing = this.isDashing.ToReadOnlyReactiveProperty();
@@ -93,7 +92,7 @@ public class Player : GameBehaviour, IDanmakuTarget
             if (_hp != 0)
                 OnReceiveDamage.Invoke();
             OnHpChange.Invoke(_hp);
-            if(_hp == 0)
+            if (_hp == 0)
             {
                 isDead = true;
                 update = false;
@@ -102,7 +101,7 @@ public class Player : GameBehaviour, IDanmakuTarget
                 OnDied.Invoke();
             }
             StartCoroutine(AfterHurt(_hurtTime));
-        } 
+        }
     }
 
     public void AddHp(int count)
@@ -152,7 +151,7 @@ public class Player : GameBehaviour, IDanmakuTarget
             StartCoroutine(Dash(dir));
             return;
         }
-        
+
         rb.velocity = dir.normalized * speed;
     }
 

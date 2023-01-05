@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class Bot : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 {
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    // private Transform _target;
+    public Transform target { get { return this.player.transform; } }
 
     private AIStateMachine _stateMachine;
     public AIStateMachine stateMachine { get { return _stateMachine; } }
@@ -17,6 +18,7 @@ public class Bot : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     private static List<Bot> bots = new List<Bot>();
 
+    [Inject]
     private Player player;
 
     [SerializeField]
@@ -47,7 +49,7 @@ public class Bot : Enemy, ITarget, IStateMachine, ISpawnDanmaku
     private Gradient gradient;
     private SpriteRenderer sr;
     private float levelSmoothed = 0;
-    [SerializeField, Range(0,0.5f)]
+    [SerializeField, Range(0, 0.5f)]
     private float levelSmoothLerp;
 
     protected override void EnemyAwake()
@@ -57,7 +59,7 @@ public class Bot : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
         _stateMachine.OnUpdateTransform.AddListener(UpdateTransform);
         _stateMachine.SetPickStateTimeRand(0.25f);
-        
+
         float angle = /*transform.rotation.eulerAngles.z*/ Random.Range(0f, 360f) * Mathf.Deg2Rad;
         _direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
         radiusSquare = radius * radius;
@@ -66,16 +68,10 @@ public class Bot : Enemy, ITarget, IStateMachine, ISpawnDanmaku
         bots.Add(this);
     }
 
-    protected override void EnemyStart()
-    {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
-    }
-
     private void UpdateTransform()
     {
         //Make the "Boids" like movement
-        Vector2 targetVector = _target.position - transform.position;
+        Vector2 targetVector = this.target.position - transform.position;
         Vector2 avoidVector = Vector2.zero;
         Vector2 alignmentVector = _direction;
         Vector2 cohesionVector = Vector2.zero;
@@ -113,7 +109,7 @@ public class Bot : Enemy, ITarget, IStateMachine, ISpawnDanmaku
         //Finalize avoidance and cohesion
         massCenter /= mass;
         cohesionVector = (massCenter - (Vector2)transform.position).normalized;
-        if(avoidVector.sqrMagnitude > 1)
+        if (avoidVector.sqrMagnitude > 1)
             avoidVector = avoidVector.normalized;
 
         //Deal with position

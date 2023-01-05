@@ -21,11 +21,6 @@ public class WarningUI : GameBehaviour
     [SerializeField]
     public UltEvent OnWarningDone = new UltEvent();
 
-    public override void GameAwake()
-    {
-        DependencyContainer.AddDependency(this);
-    }
-
     public void StartWarning()
     {
         StartCoroutine(DoWarning());

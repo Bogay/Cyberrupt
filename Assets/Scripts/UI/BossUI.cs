@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using Reflex.Scripts.Attributes;
 
 public class BossUI : GameBehaviour
 {
@@ -14,13 +15,15 @@ public class BossUI : GameBehaviour
     private CanvasGroup canvasGroup;
     [SerializeField]
     private UIOverlayChecker checker;
-    
+
     private Enemy boss = null;
+
+    [Inject]
+    private Player player;
 
     public override void GameStart()
     {
         checker.update = false;
-        Player player = DependencyContainer.GetDependency<Player>() as Player;
         EnemyManager.instance.OnBossSpawn.AddListener(ShowBossUI);
         player.OnDied.AddListener(DisableUI);
     }
@@ -31,7 +34,7 @@ public class BossUI : GameBehaviour
             healthBar.value = boss.hp / boss.maxHP;
     }
 
-    
+
     private void ShowBossUI(Enemy inputBoss)
     {
         boss = inputBoss;

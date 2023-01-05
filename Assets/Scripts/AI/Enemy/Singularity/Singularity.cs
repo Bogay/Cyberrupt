@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class Singularity : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 {
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    public Transform target => this.player.transform;
 
     private AIStateMachine _stateMachine;
     public AIStateMachine stateMachine { get { return _stateMachine; } }
@@ -19,6 +19,7 @@ public class Singularity : Enemy, ITarget, IStateMachine, ISpawnDanmaku
     private Transform parent;
     [SerializeField]
     private float speed;
+    [Inject]
     private Player player;
 
     protected override void EnemyAwake()
@@ -27,12 +28,6 @@ public class Singularity : Enemy, ITarget, IStateMachine, ISpawnDanmaku
         _danmakuHelper = GetComponent<SpawnDanmakuHelper>();
 
         _stateMachine.OnUpdateTransform.AddListener(UpdateTransform);
-    }
-
-    protected override void EnemyStart()
-    {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
     }
 
     private void UpdateTransform()

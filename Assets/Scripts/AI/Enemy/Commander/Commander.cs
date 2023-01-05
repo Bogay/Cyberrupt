@@ -1,11 +1,12 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
+using Reflex;
+using Reflex.Scripts.Attributes;
 
 public class Commander : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 {
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    public Transform target => this.player.transform;
 
     private AIStateMachine _stateMachine;
     public AIStateMachine stateMachine { get { return _stateMachine; } }
@@ -13,10 +14,13 @@ public class Commander : Enemy, ITarget, IStateMachine, ISpawnDanmaku
     private SpawnDanmakuHelper _danmakuHelper;
     public SpawnDanmakuHelper danmakuHelper { get { return _danmakuHelper; } }
 
-    public UnityEvent OnUpdateTransform => this.stateMachine.OnUpdateTransform;    
+    public UnityEvent OnUpdateTransform => this.stateMachine.OnUpdateTransform;
     //====================
 
+    [Inject]
     private Player player;
+    [Inject]
+    private readonly Container container;
 
     [SerializeField]
     private Transform muzzle;
@@ -51,12 +55,6 @@ public class Commander : Enemy, ITarget, IStateMachine, ISpawnDanmaku
         _stateMachine.OnUpdateTransform.AddListener(UpdateTransform);
     }
 
-    protected override void EnemyStart()
-    {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
-    }
-
     protected override void EnemyUpdate()
     {
         timer -= Time.deltaTime;
@@ -65,7 +63,10 @@ public class Commander : Enemy, ITarget, IStateMachine, ISpawnDanmaku
         {
             float rand = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
 
-            GameObject go = Instantiate(bot, transform.position + new Vector3(Mathf.Cos(rand), Mathf.Sin(rand)) * spawnRadius, Quaternion.identity);
+            GameObject go = this.container.InstantiateGameObject(
+                bot,
+                transform.position + new Vector3(Mathf.Cos(rand), Mathf.Sin(rand)) * spawnRadius,
+                Quaternion.identity);
             Enemy newBot = go.GetComponent<Enemy>();
             newBot.OverrideProperty(propertyForBot);
             newBot.OnDeath.AddPersistentCall((Action)BotKilled);

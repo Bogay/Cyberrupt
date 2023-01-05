@@ -5,9 +5,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using Reflex.Scripts.Attributes;
 
 public class PlayerUI : GameBehaviour
 {
+    [Inject]
     private Player player;
     private PlayerUISetting setting;
 
@@ -70,9 +72,8 @@ public class PlayerUI : GameBehaviour
 
     public override void GameStart()
     {
-        if(setting == null)
-        setting = PlayerUISetting.instance;
-        player = DependencyContainer.GetDependency<Player>() as Player;
+        if (setting == null)
+            setting = PlayerUISetting.instance;
 
         player.OnDied.AddListener(DisableUI);
 
@@ -121,7 +122,7 @@ public class PlayerUI : GameBehaviour
     //Health and Bomb
     private void SetHPAndBomb()
     {
-        for(int i = 0; i < player.hp; i++)
+        for (int i = 0; i < player.hp; i++)
         {
             GameObject hp = Instantiate(setting.heartSpriteDisplayer, playerHpBar.transform);
             hpBar.Add(hp.GetComponent<Image>());
@@ -137,13 +138,13 @@ public class PlayerUI : GameBehaviour
 
     public void UpdateHp(int hp)
     {
-        while(hpBar.Count != player.hp)
+        while (hpBar.Count != player.hp)
         {
             if (hpBar.Count > player.hp)
             {
                 Destroy(hpBar[hpBar.Count - 1].gameObject);
                 hpBar.RemoveAt(hpBar.Count - 1);
-            }  
+            }
             else
             {
                 GameObject newHp = Instantiate(setting.heartSpriteDisplayer, playerHpBar.transform);
@@ -157,10 +158,10 @@ public class PlayerUI : GameBehaviour
 
     public void UpdateBomb(int bombCount)
     {
-        if(bombCount > bombBar.Count)
+        if (bombCount > bombBar.Count)
         {
             int delta = bombCount - bombBar.Count;
-            for(int i = 0; i < delta; i++)
+            for (int i = 0; i < delta; i++)
             {
                 GameObject bomb = Instantiate(setting.bombSpriteDisplayer, playerBombBar.transform);
                 Image bombImage = bomb.GetComponent<Image>();
@@ -190,7 +191,7 @@ public class PlayerUI : GameBehaviour
     public void UpdateMultiplier(Vector3 data)
     {
         multiplierSlider.value = Mathf.Clamp01(data.x / data.y);
-        if(data.z > currentMultiplier)
+        if (data.z > currentMultiplier)
         {
             multiplerText.text = "x" + data.z.ToString();
             currentMultiplier = data.z;
@@ -198,7 +199,7 @@ public class PlayerUI : GameBehaviour
             mutiplierNotificationText.color = multiplierUpgradeColor;
             StartCoroutine(MutiplierNotificationTextFade());
         }
-        else if(data.z < currentMultiplier)
+        else if (data.z < currentMultiplier)
         {
             multiplerText.text = "x" + data.z.ToString();
             currentMultiplier = data.z;
@@ -239,7 +240,7 @@ public class PlayerUI : GameBehaviour
     //Skill
     public void UpdateSkillList(List<Skill> skills)
     {
-        if(skills.Count == 0)
+        if (skills.Count == 0)
         {
             skillIconFront.color = Color.clear;
             skillIconBase.color = new Color(skillIconBase.color.r, skillIconBase.color.g, skillIconBase.color.b, 0);
@@ -274,7 +275,7 @@ public class PlayerUI : GameBehaviour
                     break;
                 Destroy(skillList[skillList.Count - 1].gameObject);
                 skillList.RemoveAt(skillList.Count - 1);
-            }  
+            }
         }
 
         for (int i = 0; i < skills.Count - 1; i++)

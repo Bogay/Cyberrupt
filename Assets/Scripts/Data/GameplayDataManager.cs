@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class GameplayDataManager : GameBehaviour
 {
@@ -39,6 +40,9 @@ public class GameplayDataManager : GameBehaviour
     public IntEvent OnScoreChange = new IntEvent();
     public Vector3Event OnMultiplierChange = new Vector3Event();
 
+    [Inject]
+    private Player player;
+
     public override void GameAwake()
     {
         if (_instance == null)
@@ -50,8 +54,7 @@ public class GameplayDataManager : GameBehaviour
     public override void GameStart()
     {
         enemyManager = EnemyManager.instance;
-        
-        Player player = DependencyContainer.GetDependency<Player>() as Player;
+
         player.OnReceiveDamage += ResetMultiplier;
         player.OnDied.AddListener(() => UpdateSaveData(false));
 
@@ -103,7 +106,7 @@ public class GameplayDataManager : GameBehaviour
 
     public void UpdateScoreAndKill(Enemy enemy)
     {
-        if(enemy.property.dieCountAsKill)
+        if (enemy.property.dieCountAsKill)
         {
             _score += (int)(enemy.property.score * scoreMultipler);
             _killCount++;

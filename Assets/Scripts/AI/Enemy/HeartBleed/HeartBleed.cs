@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Reflex.Scripts.Attributes;
 
 public class HeartBleed : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 {
-    private Transform _target;
-    public Transform target { get { return _target; } }
+    public Transform target => this.player.transform;
 
     private AIStateMachine _stateMachine;
     public AIStateMachine stateMachine { get { return _stateMachine; } }
@@ -15,6 +15,7 @@ public class HeartBleed : Enemy, ITarget, IStateMachine, ISpawnDanmaku
 
     //====================
 
+    [Inject]
     private Player player;
 
     [SerializeField]
@@ -31,15 +32,9 @@ public class HeartBleed : Enemy, ITarget, IStateMachine, ISpawnDanmaku
         Death.AddAction(() => Instantiate(clearScreen));
     }
 
-    protected override void EnemyStart()
-    {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-        _target = player.transform;
-    }
-
     private void UpdateTransform()
     {
-        Vector2 direction = _target.position - transform.position;
+        Vector2 direction = this.target.position - transform.position;
         transform.position += (Vector3)direction.normalized * speed * Time.fixedDeltaTime;
     }
 }

@@ -38,7 +38,7 @@ public class Player_AudioPlayRequester : AudioPlayRequester
 
     public void StartWeaponChargeSFX()
     {
-        if(weaponChargeSFX != null)
+        if (weaponChargeSFX != null)
             weaponChargeAudioSource = manager.PlaySFXInterruptable(this, weaponChargeSFX);
     }
 

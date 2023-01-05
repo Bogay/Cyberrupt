@@ -72,7 +72,7 @@ public class GameSystem : MonoBehaviour
                 behaviours.RemoveAt(i);
         }
 
-        if(behavioursChanged)
+        if (behavioursChanged)
         {
             behaviours.Sort(delegate (GameBehaviour a, GameBehaviour b)
             {
@@ -83,7 +83,7 @@ public class GameSystem : MonoBehaviour
         while (destroyQueue.Count > 0)
         {
             GameBehaviour behaviour = destroyQueue.Dequeue();
-            if(behaviours.Contains(behaviour))
+            if (behaviours.Contains(behaviour))
             {
                 behaviours.Remove(behaviour);
                 if (behaviour.destroyGameObjectWhenKilled)
@@ -114,7 +114,7 @@ public class GameSystem : MonoBehaviour
 
     public void RemoveAndKillBehaviour(GameBehaviour behaviour)
     {
-        if(behaviour.id < 0)
+        if (behaviour.id < 0)
             throw new System.Exception("Invalid id number when trying to remove behaviour : " + behaviour.id.ToString());
 
         destroyQueue.Enqueue(behaviour);
@@ -122,9 +122,6 @@ public class GameSystem : MonoBehaviour
 
     void OnSceneUnloaded(Scene scene)
     {
-        //這是為了確保所有非static/singleton的物體會在場景轉換時自動清除reference
-        DependencyContainer.Clear();
-
         int len = behaviours.Count - 1;
         for (int i = len; i >= 0; i--)
         {
@@ -137,7 +134,7 @@ public class GameSystem : MonoBehaviour
             {
                 behaviours[i].OnKilled();
                 behaviours.RemoveAt(i);
-            }                
+            }
         }
         destroyQueue.Clear();
     }
